@@ -1,0 +1,9 @@
+certifi==2026.2.25
+charset-normalizer==3.4.7
+idna==3.11
+Kurigram==2.2.19
+pyaes==1.6.1
+PySocks==1.7.1
+requests==2.33.1
+TgCrypto==1.2.5
+urllib3==2.6.3

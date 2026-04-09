@@ -1,0 +1,8 @@
+sav.json
+au/
+.venv
+.idea
+.vscode
+*.session
+*.session-journal
+__pycache__
