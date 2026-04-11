@@ -30,4 +30,4 @@ class Save:
 class TrackInfo:
     name: str
     url: str
-    file_id: int
+    msg_id: int

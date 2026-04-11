@@ -19,10 +19,11 @@ class Tg:
         dec = FileId.decode(msg.audio.file_id)
         id = InputDocument(id=dec.media_id, access_hash=dec.access_hash, file_reference=dec.file_reference)
         await self.app.invoke(functions.account.SaveMusic(id=id))
-        return msg.audio.file_id
+        return msg.id
 
-    async def move(self, file_id: int) -> None:
-        dec = FileId.decode(file_id)
+    async def move(self, msg_id: int) -> None:
+        msg = await self.app.get_messages(self.chat_id, msg_id)
+        dec = FileId.decode(msg.audio.file_id)
         id = InputDocument(id=dec.media_id, access_hash=dec.access_hash, file_reference=dec.file_reference)
         await self.app.invoke(functions.account.SaveMusic(id=id))
 

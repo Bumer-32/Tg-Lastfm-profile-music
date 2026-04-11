@@ -1,11 +1,11 @@
 import asyncio
 import os
-from time import sleep, time
+from time import sleep
 
+from LastFMClient import LastFMClient
 from Save import Save, TrackInfo
 from Tg import Tg
 from YouTube import YouTube
-from LastFMClient import LastFMClient
 
 
 class Main:
@@ -44,13 +44,13 @@ class Main:
                     print(path)
                     new_path = self.yt.process_track(path, name, artist)
                     print(new_path)
-                    file_id = await tg.upload_and_set(new_path)
-                    self.cache.add(TrackInfo(name=for_search, url=found, file_id=file_id))
+                    msg_id = await tg.upload_and_set(new_path)
+                    self.cache.add(TrackInfo(name=for_search, url=found, msg_id=msg_id))
                     print("saved")
                     os.remove(new_path)
             else:
                 print("moving")
-                await tg.move(found_in_save.file_id)
+                await tg.move(found_in_save.msg_id)
             self.last_played = for_search
 
 
