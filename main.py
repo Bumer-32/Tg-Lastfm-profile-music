@@ -22,6 +22,7 @@ class Main:
         self.cache = Save(path="sav.json")
         self.last_played = ""
         self.played_time = -1
+        self.actually_last_played = ""
 
 
     async def run(self):
@@ -37,7 +38,12 @@ class Main:
             if not artist:
                 self.played_time = 0
                 continue
-            if self.last_played == for_search: continue
+            if self.last_played == for_search: continue # this only for moments when track already set
+
+            if self.actually_last_played != for_search: # for moments when track are not set and you skip track
+                self.played_time = 0
+                self.actually_last_played = for_search
+                continue
 
             if self.played_time == 0: self.played_time = time()
             if time() - self.played_time < 30: continue
