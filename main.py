@@ -1,6 +1,6 @@
 import asyncio
 import os
-from time import sleep
+from time import sleep, time
 
 from LastFMClient import LastFMClient
 from Save import Save, TrackInfo
@@ -21,6 +21,7 @@ class Main:
         self.yt = YouTube(output_dir="au/")
         self.cache = Save(path="sav.json")
         self.last_played = ""
+        self.played_time = -1
 
 
     async def run(self):
@@ -32,8 +33,15 @@ class Main:
             print("check")
             artist, name = await self.last_fm.get_now_playing()
             for_search = f"{artist} - {name}"
-            if not artist: continue
+
+            if not artist:
+                self.played_time = 0
+                continue
             if self.last_played == for_search: continue
+
+            if self.played_time == 0: self.played_time = time()
+            if time() - self.played_time < 30: continue
+
             found_in_save = self.cache.find(for_search)
             if not found_in_save:
                 print("searching")
@@ -52,6 +60,7 @@ class Main:
                 print("moving")
                 await tg.move(found_in_save.msg_id)
             self.last_played = for_search
+            self.played_time = 0
 
 
 if __name__ == "__main__":
