@@ -30,24 +30,28 @@ class Main:
         while True:
             sleep(5)
             print("check")
-            now = await self.last_fm.get_now_playing()
-            if not now: continue
-            if self.last_played == now: continue
-            found_in_save = self.cache.find(now)
+            artist, name = await self.last_fm.get_now_playing()
+            for_search = f"{artist} - {name}"
+            if not artist: continue
+            if self.last_played == for_search: continue
+            found_in_save = self.cache.find(for_search)
             if not found_in_save:
                 print("searching")
-                found = await self.yt.search(now)
+                found = await self.yt.search(for_search)
                 if found:
                     print(f"found {found}")
                     path = await self.yt.download(found)
                     print(path)
-                    media_id, access_hash, file_reference = await tg.upload_and_set(path)
-                    self.cache.add(TrackInfo(name=now, url=found, media_id=media_id, access_hash=access_hash, file_reference=file_reference))
+                    new_path = self.yt.process_track(path, name, artist)
+                    print(new_path)
+                    file_id = await tg.upload_and_set(new_path)
+                    self.cache.add(TrackInfo(name=for_search, url=found, file_id=file_id))
                     print("saved")
+                    os.remove(new_path)
             else:
                 print("moving")
-                await tg.move(found_in_save)
-            self.last_played = now
+                await tg.move(found_in_save.file_id)
+            self.last_played = for_search
 
 
 if __name__ == "__main__":

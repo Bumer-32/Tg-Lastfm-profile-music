@@ -1,6 +1,10 @@
 import asyncio
 import os
 import subprocess
+from pathlib import Path
+
+from mutagen.easyid3 import EasyID3
+from mutagen.mp3 import MP3
 
 
 class YouTube:
@@ -39,3 +43,17 @@ class YouTube:
 
         stdout, _ = await process.communicate()
         return stdout.decode().strip()
+
+    @staticmethod
+    def process_track(path: str, track_name: str, artist: str) -> str:
+        mp3 = MP3(path, ID3=EasyID3)
+
+        mp3["artist"] = artist
+        mp3["title"] = track_name
+        mp3.save()
+
+        file = Path(path)
+        new_file = file.with_name(f"{track_name}.mp3")
+        file.rename(new_file)
+
+        return new_file
