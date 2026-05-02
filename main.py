@@ -32,41 +32,44 @@ class Main:
         while True:
             sleep(5)
             print("check")
-            artist, name = await self.last_fm.get_now_playing()
-            for_search = f"{artist} - {name}"
+            try:
+                artist, name = await self.last_fm.get_now_playing()
+                for_search = f"{artist} - {name}"
 
-            if not artist:
+                if not artist:
+                    self.played_time = 0
+                    continue
+                if self.last_played == for_search: continue # this only for moments when track already set
+
+                if self.actually_last_played != for_search: # for moments when track are not set and you skip track
+                    self.played_time = 0
+                    self.actually_last_played = for_search
+                    continue
+
+                if self.played_time == 0: self.played_time = time()
+                if time() - self.played_time < 30: continue
+
+                found_in_save = self.cache.find(for_search)
+                if not found_in_save:
+                    print("searching")
+                    found = await self.yt.search(for_search)
+                    if found:
+                        print(f"found {found}")
+                        path = await self.yt.download(found)
+                        print(path)
+                        new_path = self.yt.process_track(path, name, artist)
+                        print(new_path)
+                        msg_id = await tg.upload_and_set(new_path)
+                        self.cache.add(TrackInfo(name=for_search, url=found, msg_id=msg_id))
+                        print("saved")
+                        os.remove(new_path)
+                else:
+                    print("moving")
+                    await tg.move(found_in_save.msg_id)
+                self.last_played = for_search
                 self.played_time = 0
-                continue
-            if self.last_played == for_search: continue # this only for moments when track already set
-
-            if self.actually_last_played != for_search: # for moments when track are not set and you skip track
-                self.played_time = 0
-                self.actually_last_played = for_search
-                continue
-
-            if self.played_time == 0: self.played_time = time()
-            if time() - self.played_time < 30: continue
-
-            found_in_save = self.cache.find(for_search)
-            if not found_in_save:
-                print("searching")
-                found = await self.yt.search(for_search)
-                if found:
-                    print(f"found {found}")
-                    path = await self.yt.download(found)
-                    print(path)
-                    new_path = self.yt.process_track(path, name, artist)
-                    print(new_path)
-                    msg_id = await tg.upload_and_set(new_path)
-                    self.cache.add(TrackInfo(name=for_search, url=found, msg_id=msg_id))
-                    print("saved")
-                    os.remove(new_path)
-            else:
-                print("moving")
-                await tg.move(found_in_save.msg_id)
-            self.last_played = for_search
-            self.played_time = 0
+            except Exception as e:
+                print(e)
 
 
 if __name__ == "__main__":
