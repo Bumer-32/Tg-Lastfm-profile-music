@@ -19,7 +19,7 @@ class Main:
 
         self.last_fm = LastFMClient(api_key=self.last_fm_api_key, username=self.last_fm_username)
         self.yt = YouTube(output_dir="au/")
-        self.cache = Save(path="sav.json")
+        self.cache = Save(path="save/sav.json")
         self.last_played = ""
         self.played_time = -1
         self.actually_last_played = ""
@@ -60,7 +60,7 @@ class Main:
                         new_path = self.yt.process_track(path, name, artist)
                         print(new_path)
                         msg_id = await tg.upload_and_set(new_path)
-                        self.cache.add(TrackInfo(name=for_search, url=found, msg_id=msg_id))
+                        self.cache.add(TrackInfo(name=for_search, msg_id=msg_id))
                         print("saved")
                         os.remove(new_path)
                 else:

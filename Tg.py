@@ -11,7 +11,7 @@ class Tg:
 
     async def start(self, api_id: int, api_hash: str, chat_id: int) -> None:
         self.chat_id = chat_id
-        self.app = Client("my_account", api_id=api_id, api_hash=api_hash)
+        self.app = Client("save/my_account", api_id=api_id, api_hash=api_hash)
         await self.app.start()
 
     async def upload_and_set(self, path: str) -> int:

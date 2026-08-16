@@ -6,3 +6,5 @@ au/
 *.session
 *.session-journal
 __pycache__
+.github
+save/

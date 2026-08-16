@@ -29,5 +29,4 @@ class Save:
 @dataclass
 class TrackInfo:
     name: str
-    url: str
     msg_id: int
