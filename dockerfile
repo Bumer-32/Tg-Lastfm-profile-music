@@ -1,6 +1,6 @@
 FROM python:3.14.4-alpine
 
-RUN apk add --no-cache ffmpeg tini \
+RUN apk add --no-cache ffmpeg tini deno \
     && adduser -D app \
     && mkdir -p /app \
     && chown -R app:app /app
