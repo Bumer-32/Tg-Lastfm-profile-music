@@ -24,8 +24,9 @@ class YouTube:
 
         stdout, stderr = await process.communicate()
         url = stdout.decode().strip()
-
+    
         if stderr:
+            print(stderr)
             return None
         else:
             return url
@@ -45,6 +46,7 @@ class YouTube:
         stdout, stderr = await process.communicate()
         path = stdout.decode().strip()
         if stderr:
+            print(stderr)
             return None
         else:
             return path
