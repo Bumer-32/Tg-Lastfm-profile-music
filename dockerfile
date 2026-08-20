@@ -13,7 +13,7 @@ RUN mkdir -p save au \
     && chown -R app:app save au \
     && pip install --no-cache-dir -r requirements.txt
 
-# USER app
+USER app
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["python", "main.py"]
