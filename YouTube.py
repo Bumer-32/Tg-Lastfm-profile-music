@@ -1,6 +1,5 @@
 import asyncio
 import os
-import subprocess
 from pathlib import Path
 
 from mutagen.easyid3 import EasyID3
@@ -8,30 +7,32 @@ from mutagen.mp3 import MP3
 
 
 class YouTube:
-    def __init__(self, output_dir) -> None:
+    def __init__(self, output_dir, yt_dlp_exec) -> None:
         self.output_dir = output_dir
+        self.yt_dlp_exec = yt_dlp_exec
+
         os.makedirs(output_dir, exist_ok=True)
 
-        subprocess.run(["yt-dlp", "-U"], capture_output=True, text=True)
-
-    @staticmethod
-    async def search(query) -> str | None:
+    async def search(self, query) -> str | None:
         process = await asyncio.create_subprocess_exec(
-            "yt-dlp",
+            self.yt_dlp_exec,
             f"ytsearch1:{query} official audio",
             "--print", "webpage_url",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
 
-        stdout, _ = await process.communicate()
+        stdout, stderr = await process.communicate()
         url = stdout.decode().strip()
 
-        return url if url else None
+        if stderr:
+            return None
+        else:
+            return url
 
-    async def download(self, url) -> str:
+    async def download(self, url) -> str | None:
         process = await asyncio.create_subprocess_exec(
-            "yt-dlp",
+            self.yt_dlp_exec,
             "-x",
             "--audio-format", "mp3",
             "-o", f"{self.output_dir}/%(title)s.%(ext)s",
@@ -41,8 +42,16 @@ class YouTube:
             stderr=asyncio.subprocess.PIPE
         )
 
-        stdout, _ = await process.communicate()
-        return stdout.decode().strip()
+        stdout, stderr = await process.communicate()
+        path = stdout.decode().strip()
+        if stderr:
+            return None
+        else:
+            return path
+
+    async def update(self) -> None:
+        process = await asyncio.create_subprocess_exec(self.yt_dlp_exec, "-U")
+        await process.wait()
 
     @staticmethod
     def process_track(path: str, track_name: str, artist: str) -> str:
